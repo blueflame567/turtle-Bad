@@ -1,0 +1,15 @@
+body {
+    background-color: #223;
+    margin: 0px;
+    padding: 0px;
+}
+
+.buttons {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.buttons button {
+    width: calc(100% / 6);
+}

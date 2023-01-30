@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turtle Controller</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+    <!-- <link rel="stylesheet" href="main.css" /> -->
+    <style>
+        .inventory table {
+            color: #fff;
+            width: 300px;
+            height: 300px;
+            border-collapse: collapse;
+            /* border: 2px solid black; */
+        }
+        
+        .inventory td {
+            background-color: #223;
+            text-align: center;
+            border: 2px solid #fff;
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Turtle Controller</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.up()')">
+        Up
+      </button>
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.forward()')">
+        Forward
+      </button>
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.down()')">
+        Down
+      </button>
+    </div>
+    <br />
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.turnLeft()')">
+        Left
+      </button>
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.back()')">
+        Forward
+      </button>
+        <button type="button" class="btn btn-secondary" onclick="send('turtle.turnRight()')">
+        Right
+      </button>
+    </div>
+    <form>
+        <input type="text" id="textField" />
+        <button type="button" id="button" onclick="sendText()">Execute</button>
+
+        <input type="number" id="idField" style="width: 40px" />
+
+        <!-- </form> -->
+        <br />
+        <button type="button" id="DigDown" onclick="send('turtle.digDown()')">
+        DigDown
+      </button>
+        <button type="button" id="Dig" onclick="send('turtle.dig()')">Dig</button>
+        <button type="button" id="DigUp" onclick="send('turtle.digUp()')">
+        DigUp
+      </button>
+        <br />
+        <button type="button" id="PlaceDown" onclick="send('turtle.placeDown()')">
+        PlaceDown
+      </button>
+        <button type="button" id="Place" onclick="send('turtle.place()')">
+        Place
+      </button>
+        <button type="button" id="PlaceUp" onclick="send('turtle.placeUp()')">
+        PlaceUp</button
+      ><br /><button type="button" id="placeSusThing" onclick="placeSusThing()">
+        create sus thing
+      </button>
+    </form>
+    <div class="inventory" id="inv"></div>
+
+    <script type="text/javascript">
+        let socket = new WebSocket("ws://47.224.180.33:5656");
+
+        function sendText() {
+            let text = document.getElementById("textField").value;
+            let id = document.getElementById("idField").value;
+            console.log(text);
+            socket.send(
+                JSON.stringify({
+                    type: "controller",
+                    turtle: text,
+                    id: Number(id),
+                })
+            );
+        }
+
+        function send(text, delay) {
+            let id = document.getElementById("idField").value;
+            console.log(text, id);
+            socket.send(
+                JSON.stringify({
+                    type: "controller",
+                    turtle: text,
+                    id: Number(id),
+                    delay: Number(delay)
+                })
+            );
+        }
+
+        function placeSusThing() {
+            send('print("Hello World")');
+        }
+
+        socket.onmessage = function(event) {
+            console.log(event.data);
+            let data = JSON.parse(event.data);
+            // console.log(data.id, document.getElementById("idField").value)
+            // if (Number(data.id) === document.getElementById("idField").value) {
+
+
+            editTableElement(row, col, data.message);
+            // }
+        };
+    </script>
+    <script>
+        var table = document.createElement("table");
+        for (var i = 0; i < 4; i++) {
+            var row = table.insertRow();
+            for (var j = 0; j < 4; j++) {
+                var cell = row.insertCell();
+            }
+        }
+        var inv = document.getElementById("inv");
+        inv.appendChild(table);
+    </script>
+    <script>
+        function editTableElement(row, col, newText) {
+            var table = document.getElementsByTagName("table")[0];
+            table.rows[row].cells[col].innerHTML = newText;
+        }
+    </script>
+    <script>
+        function detectClick(callback) {
+            var table = document.getElementsByTagName("table")[0];
+            for (var i = 0; i < table.rows.length; i++) {
+                for (var j = 0; j < table.rows[i].cells.length; j++) {
+                    (function(i, j) {
+                        table.rows[i].cells[j].onclick = function() {
+                            callback(i + 1, j + 1);
+                        };
+                    })(i, j);
+                }
+            }
+        }
+
+        detectClick(function(row, col) {
+            let slot = (row - 1) * 4 + col;
+            // alert("clicked on slot " + slot);
+            //
+            var row, col = row,
+                col
+            let id = document.getElementById("idField").value;
+            console.log("clicked on slot " + slot, id)
+            send("turtle.select(" + slot + ")")
+            send("turtle.getItemDetail(" + slot + ").name", 500);
+
+        });
+        //socket.onmessage = function(event) {
+        //let data = JSON.parse(event.data);
+        //if (data.id === document.getElementById("idField").value) {
+        //    editTableElement(row, col, data.message);
+        //}
+        //};
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+
+</html>
