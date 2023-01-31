@@ -7,24 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Turtle Controller</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
-    <!-- <link rel="stylesheet" href="main.css" /> -->
-    <style>
-        .inventory table {
-            color: #fff;
-            width: 300px;
-            height: 300px;
-            border-collapse: collapse;
-            /* border: 2px solid black; */
-        }
-        
-        .inventory td {
-            background-color: #223;
-            text-align: center;
-            border: 2px solid #fff;
-            width: 50px;
-            height: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="main.css" />
+    
 </head>
 
 <body>
@@ -85,6 +69,7 @@
       ><br /><button type="button" id="placeSusThing" onclick="placeSusThing()">
         create sus thing
       </button>
+      <a href="../../assets/resourcepack/assets/minecraft/textures/item/"></a>
     </form>
     <div class="inventory" id="inv"></div>
 
@@ -104,33 +89,34 @@
             );
         }
 
-      function send(text) {
-        let id = document.getElementById("idField").value;
-        console.log(text, id);
-        socket.send(
-          JSON.stringify({
-            type: "controller",
-            turtle: text,
-            id: Number(id),
-          })
-        );
-      }
+        function send(text, delay) {
+            let id = document.getElementById("idField").value;
+            console.log(text, id);
+            socket.send(
+                JSON.stringify({
+                    type: "controller",
+                    turtle: text,
+                    id: Number(id),
+                    delay: Number(delay)
+                })
+            );
+        }
       function placeSusThing() {
         send('print("Hello World")');
       }
 
       socket.onmessage = function (event) {
-        console.log(event.data);
+        // console.log(event.data);
         let data = JSON.parse(event.data);
         // console.log(data.id, document.getElementById("idField").value)
         // if (Number(data.id) === document.getElementById("idField").value) {
           
-           
-            editTableElement(row, col, data.message);
+            console.log(data.message)
+            console.log(invGrid[0],invGrid[1])
+
+            editTableElement(invGrid[0]-1,invGrid[1]-1, data.message);
             // }
         };
-    </script>
-    <script>
         var table = document.createElement("table");
         for (var i = 0; i < 4; i++) {
             var row = table.insertRow();
@@ -140,14 +126,26 @@
         }
         var inv = document.getElementById("inv");
         inv.appendChild(table);
-    </script>
-    <script>
-        function editTableElement(row, col, newText) {
+
+        function editTableElement(row, col, itemId) {
             var table = document.getElementsByTagName("table")[0];
-            table.rows[row].cells[col].innerHTML = newText;
+            let [mod, item] = itemId.split(":");
+            var imagePaths = ['../../assets/resourcepack/assets/'+mod+'/textures/block/'+item+'.png','../../assets/resourcepack/assets/'+mod+'/textures/item/'+item+'.png']
+            
+            for (var path of imagePaths) {
+              var image = new Image();
+              image.src = path;
+              console.log(image.src)
+              console.log(image.width)
+              if (image.width) {
+                // table.rows[row].cells[col].appendChild(image);
+                table.rows[row].cells[col].innerHTML = '<img src="'+path+'" alt="'+itemId+'">'
+                break;
+              }
+            }
+            
         }
-    </script>
-    <script>
+
       function detectClick(callback) {
         var table = document.getElementsByTagName("table")[0];
         for (var i = 0; i < table.rows.length; i++) {
@@ -161,17 +159,18 @@
         }
       }
 
-      detectClick(function (row, col) {
-        let slot = (row - 1) * 4 + col;
-        // alert("clicked on slot " + slot);
-        //
-        var row, col = row, col
-        let id = document.getElementById("idField").value;
-        console.log("clicked on slot " + slot, id)
-        send("turtle.select(" + slot + ")");
-        send("turtle.getItemDetail(" + slot + ").name");
-        
-      });
+      detectClick(function(row, col) {
+            let slot = (row - 1) * 4 + col;
+            // alert("clicked on slot " + slot);
+            // console.log(col,row)
+            
+            let id = document.getElementById("idField").value;
+            console.log("clicked on slot " + slot, id)
+            send("turtle.select(" + slot + ")")
+            send("turtle.getItemDetail(" + slot + ").name", 500);
+            return invGrid = [row, col]
+
+        });
       
     </script>
 
