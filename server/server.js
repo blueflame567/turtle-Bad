@@ -18,11 +18,11 @@ wss.on('connection', function connection(ws, req) {
             const data = JSON.parse(message);
             if (data.type === "turtle") {
                 console.log("Turtle Sent Message: ", ws.id, data.type, data.id, data);
-                sendToID(data.turtle, data.id);
+                sendToID(data.turtle, data.id - 1);
             }
             if (data.type === "controller") {
                 console.log("Controller Sent Message: ", ws.id, data.type, data.id, data);
-                sendToID(data.turtle, data.id, data.delay);
+                sendToID(data.turtle, data.id, data.delay, data.return);
             }
         } catch (e) {
             message = message.toString();
@@ -34,7 +34,10 @@ wss.on('connection', function connection(ws, req) {
     });
 });
 
-function sendToID(message, id, delay = 0) {
+function sendToID(message, id, delay = 0, returnMessage) {
+    if (returnMessage = "false") {
+        idCounter = undefined;
+    }
     let client = CLIENTS.find(client => client.id === id);
     if (client) {
         setTimeout(function() {
