@@ -138,17 +138,29 @@
         );
       }
 
-      function send(text) {
-        let id = document.getElementById("idField").value;
-        console.log(text, id);
-        socket.send(
-          JSON.stringify({
-            type: "controller",
-            turtle: text,
-            id: Number(id),
-          })
-        );
-      }
+      // function send(text) {
+      //   let id = document.getElementById("idField").value;
+      //   console.log(text, id);
+      //   socket.send(
+      //     JSON.stringify({
+      //       type: "controller",
+      //       turtle: text,
+      //       id: Number(id),
+      //     })
+      //   );
+      // }
+      function send(text, delay) {
+            let id = document.getElementById("idField").value;
+            console.log(text, id);
+            socket.send(
+                JSON.stringify({
+                    type: "controller",
+                    turtle: text,
+                    id: Number(id),
+                    delay: Number(delay)
+                })
+            );
+        }
       function placeSusThing() {
         send('print("Hello World")');
       }
@@ -159,7 +171,7 @@
         // console.log(data.id, document.getElementById("idField").value)
         // if (Number(data.id) === document.getElementById("idField").value) {
           
-           
+           console.log(data)
             editTableElement(row, col, data.message);
           // }
       };
@@ -182,30 +194,54 @@
       }
     </script>
     <script>
+      // function detectClick(callback) {
+      //   var table = document.getElementsByTagName("table")[0];
+      //   for (var i = 0; i < table.rows.length; i++) {
+      //     for (var j = 0; j < table.rows[i].cells.length; j++) {
+      //       (function (i, j) {
+      //         table.rows[i].cells[j].onclick = function () {
+      //           callback(i + 1, j + 1);
+      //         };
+      //       })(i, j);
+      //     }
+      //   }
+      // }
       function detectClick(callback) {
-        var table = document.getElementsByTagName("table")[0];
-        for (var i = 0; i < table.rows.length; i++) {
-          for (var j = 0; j < table.rows[i].cells.length; j++) {
-            (function (i, j) {
-              table.rows[i].cells[j].onclick = function () {
-                callback(i + 1, j + 1);
-              };
-            })(i, j);
-          }
+            var table = document.getElementsByTagName("table")[0];
+            for (var i = 0; i < table.rows.length; i++) {
+                for (var j = 0; j < table.rows[i].cells.length; j++) {
+                    (function(i, j) {
+                        table.rows[i].cells[j].onclick = function() {
+                            callback(i + 1, j + 1);
+                        };
+                    })(i, j);
+                }
+            }
         }
-      }
 
-      detectClick(function (row, col) {
-        let slot = (row - 1) * 4 + col;
-        // alert("clicked on slot " + slot);
-        //
-        var row, col = row, col
-        let id = document.getElementById("idField").value;
-        console.log("clicked on slot " + slot, id)
-        send("turtle.select(" + slot + ")");
-        send("turtle.getItemDetail(" + slot + ").name");
+      // detectClick(function (row, col) {
+      //   let slot = (row - 1) * 4 + col;
+      //   // alert("clicked on slot " + slot);
+      //   //
+      //   var row, col = row, col
+      //   let id = document.getElementById("idField").value;
+      //   console.log("clicked on slot " + slot, id)
+      //   send("turtle.select(" + slot + ")");
+      //   send("turtle.getItemDetail(" + slot + ").name");
         
-      });
+      // });
+
+      detectClick(function(row, col) {
+            let slot = (row - 1) * 4 + col;
+            // alert("clicked on slot " + slot);
+            //
+            var row, col = row, col
+            let id = document.getElementById("idField").value;
+            console.log("clicked on slot " + slot, id)
+            send("turtle.select(" + slot + ")")
+            send("turtle.getItemDetail(" + slot + ").name", 500);
+
+        });
       // socket.onmessage = function (event) {
       //     let data = JSON.parse(event.data);
       //     if (data.id === document.getElementById("idField").value) {
