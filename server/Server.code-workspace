@@ -1,0 +1,13 @@
+{
+    "folders": [
+		{
+			"name": "Server",
+			"path": "../../../Website/F/Server"
+		},
+		{
+			"name": "turtle-Bad",
+			"path": ".."
+		}
+	],
+    "settings": {}
+}
